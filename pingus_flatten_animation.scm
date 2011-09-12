@@ -14,7 +14,7 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http:;;www.gnu.org/licenses/>.
 
-(define (script-fu-pingus-flatten-animation image drawable)
+(define (script-fu-pingus-flatten-animation image drawable multi-directional)
   (let* ((layers (gimp-image-get-layers image))
 	 (num-layers  (car layers))
 	 (layer-array (cadr layers))
@@ -23,7 +23,9 @@
 
     (gimp-undo-push-group-start image)
 
-    (gimp-image-resize image (* width num-layers) height 0 0)
+    (if (= multi-directional 1)
+        (gimp-image-resize image (* width num-layers) (* height 2) 0 0)
+        (gimp-image-resize image (* width num-layers) height 0 0))
 
     (let ((idx 0))
       (while (< idx num-layers)
@@ -33,6 +35,20 @@
                                      0)
                (set! idx (+ idx 1)))))
 
+    (if (= multi-directional 1)
+        (let ((idx 0))
+          (while (< idx num-layers)
+                 (let ((layer (vector-ref layer-array idx)))
+
+                   (let ((new-layer (car (gimp-layer-copy layer FALSE))))
+                     (gimp-image-add-layer image new-layer 0)
+                     (gimp-layer-translate new-layer 
+                                           0
+                                           height)
+                     (gimp-drawable-transform-flip-simple new-layer ORIENTATION-HORIZONTAL TRUE 0 FALSE))
+
+                   (set! idx (+ idx 1))))))
+    
     (gimp-image-merge-visible-layers image CLIP-TO-IMAGE)
 
     (gimp-undo-push-group-end image)
@@ -49,6 +65,7 @@
  "September 12, 2011"
  "RGBA RGB INDEXED*"
  SF-IMAGE    "Image"    0
- SF-DRAWABLE "Drawable" 0)
+ SF-DRAWABLE "Drawable" 0
+ SF-TOGGLE "Multi Directional" FALSE)
 
 ;; EOF ;;
