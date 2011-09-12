@@ -9,4 +9,8 @@ Pingus:
 Most of the scripts are general purpose scripts and thus can be used
 for other games and projects
 
+To use them, copy or link them to the Gimp script directory:
+
+  ln -s *.scm ~/.gimp-2.6/scripts/
+
 # EOF #
