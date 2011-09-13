@@ -14,6 +14,10 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http:;;www.gnu.org/licenses/>.
 
+(define (number->string-04d num)
+  (cond ((< num  10) (string-append "0" (number->string num)))
+        (t            (number->string num))))
+
 (define (script-fu-pingus-unflatten-animation image drawable num-frames multi-directional)
   (let* ((width  (car (gimp-image-width image)))
 	 (height (car (gimp-image-height image)))
@@ -45,6 +49,10 @@
                  (gimp-layer-translate layer 
                                        (- (* frame frame-width))
                                        0)
+                 
+                 ;; set layer name
+                 (gimp-drawable-set-name layer (string-append "Frame #" (number->string-04d frame)))
+
                  (set! frame (+ frame 1))))))   
 
     (gimp-image-resize image frame-width frame-height 0 0)
